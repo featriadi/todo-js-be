@@ -3,56 +3,78 @@ const Task = require('../models/Task');
 module.exports = {
     createTask: async (req, res) => {
         try {
-            const { note } = req.body;
-            Task.create({ note });
+            const task = { 
+                note: req.body.note,
+                completed: false
+            };
+            const data = await Task.create(task);
 
-            res.statusCode = 201;
-            res.send('Success create task');
+            return res.status(201).json(data)
         } catch (error) {
-            res.send(error.message);
+            return res.status(404).json({
+                status: 'error',
+                message: error.message,
+            });
         }
     },
 
     readTask: async (req, res) => {
         try {
-            const task = await Task.find();
+            const { completed } = req.query;
+            var data;
 
-            res.statusCode = 200;
-            res.send(task)
+            if (completed) {
+                data = await Task.find({ 
+                    completed: completed
+                });
+            } else {
+                data = await Task.find();
+            }
+
+            return res.status(200).json(data)
         } catch (error) {
-            res.send(error.message)
+            return res.status(404).json({
+                status: 'error',
+                message: error.message,
+            });
         }
     },
 
     updateTask: async (req, res) => {
         try {
             const { id } = req.params;
-            const { note } = req.body;
-            const task = await Task.findOne({ _id: id });
+            const { note, completed } = req.body;
+            const data = await Task.findOne({ _id: id });
 
-            task.note = note;
-            task.save();
+            data.note = note;
+            data.completed = completed;
+            data.save();
 
-            res.statusCode = 200;
-            res.send('Success update task')
+            return res.status(200).json(data)
         } catch (error) {
-            res.statusCode = 410;
-            res.send('Task not found');
+            return res.status(404).json({
+                status: 'error',
+                message: 'Task not found',
+            });
         }
     },
 
     deleteTask: async (req, res) => {
         try {
             const { id } = req.params;
-            const task = await Task.findOne({ _id: id });
+            const data = await Task.findOne({ _id: id });
 
-            task.deleteOne();
-
-            res.statusCode = 200;
-            res.send("Success delete task")
+            data.deleteOne();
+            
+            return res.status(200).json({
+                status: 'success',
+                message: 'Success delete task',
+            });
         } catch (error) {
-            res.statusCode = 410;
-            res.send('Task not found');
+            return res.status(404).json({
+                status: 'error',
+                message: 'Task not found',
+            });
         }
     },
 }
