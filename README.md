@@ -13,7 +13,7 @@ Retrieve a list of tasks.
 ### `GET /`
 
 #### Parameters
-- `completed` (optional): Filter tasks by status. Possible values are true or false.
+- `completed` (optional): Filter tasks by completed. Possible values are true or false.
 
 ### Create Task
 
